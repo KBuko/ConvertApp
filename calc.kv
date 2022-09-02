@@ -1,0 +1,84 @@
+<LabelsAndInput@MDLabel>:
+    size_hint: (0.02, None)
+    text_size: self.size
+    halign: 'left'
+    valign: 'middle'
+    height: 30
+
+<InputInfo@MDTextField>:
+    multiline: False
+    size_hint: (.1, None)
+    halign: 'center'
+    height: 30
+    input_type: 'number'
+    input_filter: 'float'
+    mode: "rectangle"
+
+<Container>:
+    orientation: 'vertical'
+
+    pln: pln
+    byn: byn
+    usd: usd
+    uah: uah
+
+    MDTopAppBar:
+        title: "MySuperApp"
+        right_action_items:
+            [
+            ["delete-outline", lambda x: app.clear_content(pln, byn, usd, uah), "clear fields"],
+            ["theme-light-dark", lambda x: app.dark_light(), 'switch theme'],
+            ]
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [90, 50, 90, 50]
+
+
+        GridLayout:
+            cols: 2
+
+            LabelsAndInput:
+                text: 'PLN'
+            InputInfo:
+                id: pln
+                hint_text: 'pln'
+
+        GridLayout:
+            cols: 2
+
+            LabelsAndInput:
+                text: 'BYN'
+            InputInfo:
+                id: byn
+                hint_text: 'byn'
+
+        GridLayout:
+            cols: 2
+
+            LabelsAndInput:
+                text: 'USD'
+            InputInfo:
+                id: usd
+                hint_text: 'usd'
+
+        GridLayout:
+            cols: 2
+
+            LabelsAndInput:
+                text: 'UAH'
+            InputInfo:
+                id: uah
+                hint_text: 'uah'
+
+        BoxLayout:
+
+            MDRaisedButton:
+                text: 'Calculate'
+                size_hint: 1, 0.7
+
+                on_release:
+                    root.Calculate()
+
+           
+
