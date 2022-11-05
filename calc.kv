@@ -1,29 +1,25 @@
-<LabelsAndInput@MDLabel>:
-    size_hint: (0.02, None)
-    text_size: self.size
-    halign: 'left'
-    valign: 'middle'
-    height: 30
-
 <InputInfo@MDTextField>:
     multiline: False
-    size_hint: (.1, None)
     halign: 'center'
-    height: 30
+    size_hint_y: None
+    height: self.minimum_height
     input_type: 'number'
     input_filter: 'float'
-    mode: "rectangle"
+    mode: "fill"
 
 <Container>:
     orientation: 'vertical'
 
     pln: pln
     byn: byn
-    usd: usd
     uah: uah
+    usd: usd
 
     MDTopAppBar:
-        title: "MySuperApp"
+        title: "YourConverter"
+        padding: ['3dp', 0, 0, '13dp']
+        left_action_items:
+            [["charity", lambda x: app.about_n_charity(), "about"]]
         right_action_items:
             [
             ["delete-outline", lambda x: app.clear_content(pln, byn, usd, uah), "clear fields"],
@@ -32,53 +28,76 @@
 
     BoxLayout:
         orientation: 'vertical'
-        padding: [90, 50, 90, 50]
+        padding: ['35dp', '25dp', '47dp', '30dp']
 
 
-        GridLayout:
-            cols: 2
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: '10dp'
 
-            LabelsAndInput:
-                text: 'PLN'
-            InputInfo:
-                id: pln
-                hint_text: 'pln'
 
-        GridLayout:
-            cols: 2
+            GridLayout:
+                cols: 2
 
-            LabelsAndInput:
-                text: 'BYN'
-            InputInfo:
-                id: byn
-                hint_text: 'byn'
 
-        GridLayout:
-            cols: 2
+                MDIconButton:
+                    icon: 'images/pln.png'
+                    icon_size: "30sp"
+                    adaptive_size: True
+                    padding: '8dp'
+                InputInfo:
+                    id: pln
+                    hint_text: 'Pln'
 
-            LabelsAndInput:
-                text: 'USD'
-            InputInfo:
-                id: usd
-                hint_text: 'usd'
+            GridLayout:
+                cols: 2
 
-        GridLayout:
-            cols: 2
 
-            LabelsAndInput:
-                text: 'UAH'
-            InputInfo:
-                id: uah
-                hint_text: 'uah'
+                MDIconButton:
+                    icon: 'images/byn.png'
+                    icon_size: "30sp"
+                    adaptive_size: True
+                    padding: '8dp'
+                InputInfo:
+                    id: byn
+                    hint_text: 'Byn'
+
+            GridLayout:
+                cols: 2
+
+
+                MDIconButton:
+                    icon: 'images/uah.png'
+                    icon_size: "30sp"
+                    adaptive_size: True
+                    padding: '8dp'
+                InputInfo:
+                    id: uah
+                    hint_text: 'Uah'
+
+            GridLayout:
+                cols: 2
+
+
+                MDIconButton:
+                    icon: 'images/usd.png'
+                    icon_size: "30sp"
+                    adaptive_size: True
+                    padding: '8dp'
+                InputInfo:
+                    id: usd
+                    hint_text: 'Usd'
 
         BoxLayout:
 
             MDRaisedButton:
                 text: 'Calculate'
-                size_hint: 1, 0.7
+                font_size: "40sp"
+                size_hint: 1, 0.8
+
 
                 on_release:
                     root.Calculate()
 
-           
+
 
