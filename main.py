@@ -17,6 +17,12 @@ to_uah = 'https://currency.world/convert/UAH/PLN/BYN/USD'
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
 
+def no_internet():
+    Htext = MDDialog(
+        title="No internet",
+        text="Please, check your internet connection",
+    )
+    Htext.open()
 
 def get_currency_price_pln():
     full_page_to_pln = get(to_pln, headers=headers)
@@ -92,32 +98,44 @@ class Container(BoxLayout):
 
     def Calculate(self):
         if self.pln.text != '' and float(self.pln.text) != Container.ArrCurency['pln']:
-            myCalculation = add_result_pln(float(self.pln.text))
-            self.byn.text = myCalculation.get('byn')
-            self.usd.text = myCalculation.get('usd')
-            self.uah.text = myCalculation.get('uah')
-            self.Set_values()
+            try:
+                myCalculation = add_result_pln(float(self.pln.text))
+                self.byn.text = myCalculation.get('byn')
+                self.usd.text = myCalculation.get('usd')
+                self.uah.text = myCalculation.get('uah')
+                self.Set_values()
+            except:
+                 no_internet()
 
         elif self.byn.text != '' and float(self.byn.text) != Container.ArrCurency['byn']:
-            myCalculation = add_result_byn(float(self.byn.text))
-            self.pln.text = myCalculation.get('pln')
-            self.usd.text = myCalculation.get('usd')
-            self.uah.text = myCalculation.get('uah')
-            self.Set_values()
+            try:
+                myCalculation = add_result_byn(float(self.byn.text))
+                self.pln.text = myCalculation.get('pln')
+                self.usd.text = myCalculation.get('usd')
+                self.uah.text = myCalculation.get('uah')
+                self.Set_values()
+            except:
+                no_internet()
 
         elif self.uah.text != '' and float(self.uah.text) != Container.ArrCurency['uah']:
-            myCalculation = add_result_uah(float(self.uah.text))
-            self.pln.text = myCalculation.get('pln')
-            self.byn.text = myCalculation.get('byn')
-            self.usd.text = myCalculation.get('usd')
-            self.Set_values()
+            try:
+                myCalculation = add_result_uah(float(self.uah.text))
+                self.pln.text = myCalculation.get('pln')
+                self.byn.text = myCalculation.get('byn')
+                self.usd.text = myCalculation.get('usd')
+                self.Set_values()
+            except:
+                no_internet()
 
         elif self.usd.text != '' and float(self.usd.text) != Container.ArrCurency['usd']:
-            myCalculation = add_result_usd(float(self.usd.text))
-            self.pln.text = myCalculation.get('pln')
-            self.byn.text = myCalculation.get('byn')
-            self.uah.text = myCalculation.get('uah')
-            self.Set_values()
+            try:
+                myCalculation = add_result_usd(float(self.usd.text))
+                self.pln.text = myCalculation.get('pln')
+                self.byn.text = myCalculation.get('byn')
+                self.uah.text = myCalculation.get('uah')
+                self.Set_values()
+            except:
+                no_internet()
 
         else:
             def Mbox():
@@ -167,8 +185,8 @@ class CalcApp(MDApp):
             self.dialog = MDDialog(
                 title="Hi, dear user!",
                 text="My name is Kate Buko, " \
-                     "I developed this app for the fastest and most convenient " \
-                     "conversion of major (in my opinion) currencies within the current " \
+                     "I developed this app for most convenient " \
+                     "conversion of major currencies (in my opinion) within the current " \
                      "situation in the world. The application will be developed and " \
                      "supplemented with new features." \
                      "\n\nYou can support the project: just click on the \"See ads\" button." \
@@ -189,5 +207,6 @@ class CalcApp(MDApp):
                 ],
             )
         self.dialog.open()
+
 if __name__ == "__main__":
     CalcApp().run()
