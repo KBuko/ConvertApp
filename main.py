@@ -1,8 +1,8 @@
 from kivymd.app import MDApp
 from kivy.uix.boxlayout import BoxLayout
 
-from bs4 import BeautifulSoup
-from requests import get
+import asyncio
+import aiohttp
 
 from kivy.config import Config
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
@@ -10,148 +10,79 @@ from kivymd.uix.dialog import MDDialog
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 
-to_pln = 'https://currency.world/convert/PLN/USD/BYN/UAH'
-to_byn = 'https://currency.world/convert/BYN/USD/PLN/UAH'
-to_usd = 'https://currency.world/convert/USD/PLN/BYN/UAH'
-to_uah = 'https://currency.world/convert/UAH/PLN/BYN/USD'
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
+async def GatherData(i):
+    try:
+        session = aiohttp.ClientSession()
+        async with session.get(url=f'https://api.exchangerate-api.com/v4/latest/{i}') as r:
+            currency_dict = (await r.json())['rates']
+            r.close()
+        return currency_dict
+    except:
+        pass
+
+
+def call_gathering():
+    pln_task = asyncio.ensure_future(GatherData('pln'))
+    byn_task = asyncio.ensure_future(GatherData('byn'))
+    uah_task = asyncio.ensure_future(GatherData('uah'))
+    usd_task = asyncio.ensure_future(GatherData('usd'))
+    eur_task = asyncio.ensure_future(GatherData('eur'))
+    cad_task = asyncio.ensure_future(GatherData('cad'))
+    return asyncio.gather(pln_task, byn_task, uah_task, usd_task, eur_task, cad_task)
+
 
 def no_internet():
     Htext = MDDialog(
         title="No internet",
-        text="Please, check your internet connection",
+        text="Please check your Internet connection. The application will be closed.",
+        buttons=[
+            MDFlatButton(
+                text="Exit",
+                on_release=lambda _: exit()
+            )],
     )
     Htext.open()
 
-def get_currency_price_pln():
-    full_page_to_pln = get(to_pln, headers=headers)
-    soup = BeautifulSoup(full_page_to_pln.content, 'html.parser')
-    convert_pln_byn = soup.find('input', {"id": "amountv2"}).get('value')
-    convert_pln_usd = soup.find('input', {"id": "amountv1"}).get('value')
-    convert_pln_uah = soup.find('input', {"id": "amountv3"}).get('value')
-    return float(convert_pln_byn), float(convert_pln_usd), float(convert_pln_uah)
-
-
-def add_result_pln(pln):
-    bynCourse, usdCourse, uahCourse = get_currency_price_pln()
-    byn = str(round((pln * bynCourse), 2))
-    usd = str(round((pln * usdCourse), 2))
-    uah = str(round((pln * uahCourse), 2))
-    return {'byn': byn, 'usd': usd, 'uah': uah}
-
-
-def get_currency_price_byn():
-    full_page_to_byn = get(to_byn, headers=headers)
-    soup = BeautifulSoup(full_page_to_byn.content, 'html.parser')
-    convert_byn_pln = soup.find('input', {"id": "amountv2"}).get('value')
-    convert_byn_usd = soup.find('input', {"id": "amountv1"}).get('value')
-    convert_byn_uah = soup.find('input', {"id": "amountv3"}).get('value')
-    return float(convert_byn_pln), float(convert_byn_usd), float(convert_byn_uah)
-
-
-def add_result_byn(byn):
-    plnCourse, usdCourse, uahCourse = get_currency_price_byn()
-    pln = str(round((byn * plnCourse), 2))
-    usd = str(round((byn * usdCourse), 2))
-    uah = str(round((byn * uahCourse), 2))
-    return {'pln': pln, 'usd': usd, 'uah': uah}
-
-
-def get_currency_price_uah():
-    full_page_to_uah = get(to_uah, headers=headers)
-    soup = BeautifulSoup(full_page_to_uah.content, 'html.parser')
-    convert_uah_pln = soup.find('input', {"id": "amountv1"}).get('value')
-    convert_uah_byn = soup.find('input', {"id": "amountv2"}).get('value')
-    convert_uah_usd = soup.find('input', {"id": "amountv3"}).get('value')
-    return float(convert_uah_pln), float(convert_uah_byn), float(convert_uah_usd)
-
-
-def add_result_uah(uah):
-    plnCourse, bynCourse, usdCourse = get_currency_price_uah()
-    pln = str(round((uah * plnCourse), 2))
-    byn = str(round((uah * bynCourse), 2))
-    usd = str(round((uah * usdCourse), 2))
-    return {'pln': pln, 'byn': byn, 'usd': usd}
-
-
-def get_currency_price_usd():
-    full_page_to_usd = get(to_usd, headers=headers)
-    soup = BeautifulSoup(full_page_to_usd.content, 'html.parser')
-    convert_usd_pln = soup.find('input', {"id": "amountv1"}).get('value')
-    convert_usd_byn = soup.find('input', {"id": "amountv2"}).get('value')
-    convert_usd_uah = soup.find('input', {"id": "amountv3"}).get('value')
-    return float(convert_usd_pln), float(convert_usd_byn), float(convert_usd_uah)
-
-
-def add_result_usd(usd):
-    plnCourse, bynCourse, uahCourse = get_currency_price_usd()
-    pln = str(round((usd * plnCourse), 2))
-    byn = str(round((usd * bynCourse), 2))
-    uah = str(round((usd * uahCourse), 2))
-    return {'pln': pln, 'byn': byn, 'uah': uah}
-
 
 class Container(BoxLayout):
-    ArrCurency = {'pln': 0.00, 'byn': 0.00, 'uah': 0.00, 'usd': 0.00}
-    Empty_text = None
+    loop = asyncio.get_event_loop()
+    pln_task, byn_task, uah_task, usd_task, eur_task, cad_task = loop.run_until_complete(call_gathering())
+    loop.close()
 
-    def Calculate(self):
-        if self.pln.text != '' and float(self.pln.text) != Container.ArrCurency['pln']:
-            try:
-                myCalculation = add_result_pln(float(self.pln.text))
-                self.byn.text = myCalculation.get('byn')
-                self.usd.text = myCalculation.get('usd')
-                self.uah.text = myCalculation.get('uah')
-                self.Set_values()
-            except:
-                 no_internet()
+    currency_validator = {'pln': 0.00, 'byn': 0.00, 'uah': 0.00, 'usd': 0.00, 'eur': 0.00, 'cad': 0.00}
 
-        elif self.byn.text != '' and float(self.byn.text) != Container.ArrCurency['byn']:
-            try:
-                myCalculation = add_result_byn(float(self.byn.text))
-                self.pln.text = myCalculation.get('pln')
-                self.usd.text = myCalculation.get('usd')
-                self.uah.text = myCalculation.get('uah')
-                self.Set_values()
-            except:
-                no_internet()
+    def __init__(self, **kwargs):
+        super(Container, self).__init__(**kwargs)
 
-        elif self.uah.text != '' and float(self.uah.text) != Container.ArrCurency['uah']:
-            try:
-                myCalculation = add_result_uah(float(self.uah.text))
-                self.pln.text = myCalculation.get('pln')
-                self.byn.text = myCalculation.get('byn')
-                self.usd.text = myCalculation.get('usd')
-                self.Set_values()
-            except:
-                no_internet()
+    def calculate(self, text, hint_text):
+        input_list = {self.pln: 'Pln', self.byn: 'Byn', self.uah: 'Uah', self.usd: 'Usd', self.eur: 'Eur',
+                      self.cad: 'Cad'}
+        for i in input_list:
+            if hint_text == input_list[i] and i.focus and i.text != '' \
+                    and float(i.text) != Container.currency_validator[input_list[i].lower()]:
+                return self.get_values(text, i)
+            elif hint_text == input_list[i] and i.focus and i.text == '':
+                for j in input_list.keys():
+                    j.text = ''
 
-        elif self.usd.text != '' and float(self.usd.text) != Container.ArrCurency['usd']:
-            try:
-                myCalculation = add_result_usd(float(self.usd.text))
-                self.pln.text = myCalculation.get('pln')
-                self.byn.text = myCalculation.get('byn')
-                self.uah.text = myCalculation.get('uah')
-                self.Set_values()
-            except:
-                no_internet()
+    def get_values(self, text, start_currency):
+        calculated_data = {
+            self.pln: Container.pln_task, self.byn: Container.byn_task, self.uah: Container.uah_task,
+            self.usd: Container.usd_task, self.eur: Container.eur_task, self.cad: Container.cad_task
+        }
+        try:
+            for cur in Container.currency_validator.keys():
+                Container.currency_validator[cur.lower()] = \
+                    round((float(text) * calculated_data[start_currency][cur.upper()]), 2)
 
-        else:
-            def Mbox():
-                self.Empty_text = MDDialog(
-                    title="No data",
-                    text="Please, enter the data for the calculation",
-                )
-                self.Empty_text.open()
-
-            Mbox()
-
-    def Set_values(self):
-        Container.ArrCurency['pln'] = float(self.pln.text)
-        Container.ArrCurency['byn'] = float(self.byn.text)
-        Container.ArrCurency['uah'] = float(self.uah.text)
-        Container.ArrCurency['usd'] = float(self.usd.text)
+            self.pln.text = str(Container.currency_validator['pln'])
+            self.byn.text = str(Container.currency_validator['byn'])
+            self.usd.text = str(Container.currency_validator['usd'])
+            self.uah.text = str(Container.currency_validator['uah'])
+            self.eur.text = str(Container.currency_validator['eur'])
+            self.cad.text = str(Container.currency_validator['cad'])
+        except:
+            no_internet()
 
 
 class CalcApp(MDApp):
@@ -173,12 +104,8 @@ class CalcApp(MDApp):
             self.theme_cls.primary_hue = "500"
             self.theme_cls.primary_palette = "Teal"
 
-    def clear_content(self, pln, byn, uah, usd):
-        pln.text = byn.text = uah.text = usd.text = ''
-        Container.ArrCurency['pln'] = 0.00
-        Container.ArrCurency['byn'] = 0.00
-        Container.ArrCurency['uah'] = 0.00
-        Container.ArrCurency['usd'] = 0.00
+    def clear_content(self, pln, byn, uah, usd, eur, cad):
+        pln.text = byn.text = uah.text = usd.text = eur.text = cad.text = ''
 
     def about_n_charity(self):
         if not self.dialog:
