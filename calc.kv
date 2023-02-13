@@ -14,6 +14,8 @@
     byn: byn
     uah: uah
     usd: usd
+    eur: eur
+    cad: cad
 
     MDTopAppBar:
         title: "YourConverter"
@@ -22,7 +24,7 @@
             [["charity", lambda x: app.about_n_charity(), "about"]]
         right_action_items:
             [
-            ["delete-outline", lambda x: app.clear_content(pln, byn, usd, uah), "clear fields"],
+            ["delete-outline", lambda x: app.clear_content(pln, byn, usd, uah, eur, cad), "clear fields"],
             ["theme-light-dark", lambda x: app.dark_light(), 'switch theme'],
             ]
 
@@ -48,6 +50,8 @@
                 InputInfo:
                     id: pln
                     hint_text: 'Pln'
+                    on_text: root.calculate(self.text, self.hint_text)
+
 
             GridLayout:
                 cols: 2
@@ -61,6 +65,7 @@
                 InputInfo:
                     id: byn
                     hint_text: 'Byn'
+                    on_text: root.calculate(self.text, self.hint_text)
 
             GridLayout:
                 cols: 2
@@ -74,6 +79,7 @@
                 InputInfo:
                     id: uah
                     hint_text: 'Uah'
+                    on_text: root.calculate(self.text, self.hint_text)
 
             GridLayout:
                 cols: 2
@@ -87,17 +93,35 @@
                 InputInfo:
                     id: usd
                     hint_text: 'Usd'
-
-        BoxLayout:
-
-            MDRaisedButton:
-                text: 'Calculate'
-                font_size: "40sp"
-                size_hint: 1, 0.8
+                    on_text: root.calculate(self.text, self.hint_text)
 
 
-                on_release:
-                    root.Calculate()
+            GridLayout:
+                cols: 2
+
+                MDIconButton:
+                    icon: 'images/eur.png'
+                    icon_size: "30sp"
+                    adaptive_size: True
+                    padding: '8dp'
+                InputInfo:
+                    id: eur
+                    hint_text: 'Eur'
+                    on_text: root.calculate(self.text, self.hint_text)
+
+
+            GridLayout:
+                cols: 2
+
+                MDIconButton:
+                    icon: 'images/cad.png'
+                    icon_size: "30sp"
+                    adaptive_size: True
+                    padding: '8dp'
+                InputInfo:
+                    id: cad
+                    hint_text: 'Cad'
+                    on_text: root.calculate(self.text, self.hint_text)
 
 
 
