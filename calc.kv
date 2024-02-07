@@ -19,13 +19,11 @@
 
     MDTopAppBar:
         title: "YourConverter"
-        padding: ['3dp', 0, 0, '13dp']
         left_action_items:
-            [["charity", lambda x: app.about_n_charity(), "about"]]
+            [["menu", lambda x: app.callback(x)]]
         right_action_items:
             [
-            ["delete-outline", lambda x: app.clear_content(pln, byn, usd, uah, eur, cad), "clear fields"],
-            ["theme-light-dark", lambda x: app.dark_light(), 'switch theme'],
+            ["delete-outline", lambda x: app.clear_content(pln, byn, usd, uah, eur, cad), "clear fields"]
             ]
 
     BoxLayout:
