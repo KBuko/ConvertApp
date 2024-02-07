@@ -1,8 +1,8 @@
 from kivymd.app import MDApp
 from kivy.uix.boxlayout import BoxLayout
 
-import asyncio
-import aiohttp
+import requests
+from concurrent.futures import ThreadPoolExecutor
 
 from kivy.config import Config
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
@@ -10,31 +10,21 @@ from kivymd.uix.dialog import MDDialog
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 
-async def GatherData(i):
+
+def gatherData(i):
+    s = requests.Session()
     try:
-        session = aiohttp.ClientSession()
-        async with session.get(url=f'https://api.exchangerate-api.com/v4/latest/{i}') as r:
-            currency_dict = (await r.json())['rates']
-            r.close()
+        data = s.get(url=f'https://api.exchangerate-api.com/v4/latest/{i}').json()
+        currency_dict = data['rates']
         return currency_dict
     except:
         pass
 
 
-def call_gathering():
-    pln_task = asyncio.ensure_future(GatherData('pln'))
-    byn_task = asyncio.ensure_future(GatherData('byn'))
-    uah_task = asyncio.ensure_future(GatherData('uah'))
-    usd_task = asyncio.ensure_future(GatherData('usd'))
-    eur_task = asyncio.ensure_future(GatherData('eur'))
-    cad_task = asyncio.ensure_future(GatherData('cad'))
-    return asyncio.gather(pln_task, byn_task, uah_task, usd_task, eur_task, cad_task)
-
-
 def no_internet():
     Htext = MDDialog(
         title="No internet",
-        text="Please check your Internet connection. The application will be closed.",
+        text="Please, check your Internet connection. The application will be closed.",
         buttons=[
             MDFlatButton(
                 text="Exit",
@@ -45,14 +35,23 @@ def no_internet():
 
 
 class Container(BoxLayout):
-    loop = asyncio.get_event_loop()
-    pln_task, byn_task, uah_task, usd_task, eur_task, cad_task = loop.run_until_complete(call_gathering())
-    loop.close()
+    pool = ThreadPoolExecutor()
+
+    pln = pool.submit(gatherData, 'pln')
+    byn = pool.submit(gatherData, 'byn')
+    uah = pool.submit(gatherData, 'uah')
+    usd = pool.submit(gatherData, 'usd')
+    eur = pool.submit(gatherData, 'eur')
+    cad = pool.submit(gatherData, 'cad')
+
+    pln_task = pln.result()
+    byn_task = byn.result()
+    uah_task = uah.result()
+    usd_task = usd.result()
+    eur_task = eur.result()
+    cad_task = cad.result()
 
     currency_validator = {'pln': 0.00, 'byn': 0.00, 'uah': 0.00, 'usd': 0.00, 'eur': 0.00, 'cad': 0.00}
-
-    def __init__(self, **kwargs):
-        super(Container, self).__init__(**kwargs)
 
     def calculate(self, text, hint_text):
         input_list = {self.pln: 'Pln', self.byn: 'Byn', self.uah: 'Uah', self.usd: 'Usd', self.eur: 'Eur',
@@ -66,11 +65,11 @@ class Container(BoxLayout):
                     j.text = ''
 
     def get_values(self, text, start_currency):
-        calculated_data = {
-            self.pln: Container.pln_task, self.byn: Container.byn_task, self.uah: Container.uah_task,
-            self.usd: Container.usd_task, self.eur: Container.eur_task, self.cad: Container.cad_task
-        }
         try:
+            calculated_data = {
+                self.pln: Container.pln_task, self.byn: Container.byn_task, self.uah: Container.uah_task,
+                self.usd: Container.usd_task, self.eur: Container.eur_task, self.cad: Container.cad_task
+            }
             for cur in Container.currency_validator.keys():
                 Container.currency_validator[cur.lower()] = \
                     round((float(text) * calculated_data[start_currency][cur.upper()]), 2)
@@ -116,15 +115,8 @@ class CalcApp(MDApp):
                      "conversion of major currencies (in my opinion) within the current " \
                      "situation in the world. The application will be developed and " \
                      "supplemented with new features." \
-                     "\n\nYou can support the project: just click on the \"See ads\" button." \
                      "\n\nThanks for choosing \"YourConverter\"!",
                 buttons=[
-                    MDRaisedButton(
-                        text="See ads",
-                        theme_text_color="Custom",
-                        on_release=lambda _: self.dialog.dismiss()
-
-                    ),
                     MDFlatButton(
                         text="Later",
                         theme_text_color="Custom",
