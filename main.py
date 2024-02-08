@@ -5,8 +5,11 @@ import requests
 from concurrent.futures import ThreadPoolExecutor
 
 from kivy.config import Config
-from kivymd.uix.button import MDFlatButton, MDRaisedButton
+from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
+
+from kivy.metrics import dp
+from kivymd.uix.menu import MDDropdownMenu
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 
@@ -91,7 +94,36 @@ class CalcApp(MDApp):
         self.icon = "images/YourConverter.png"
         self.theme_cls.primary_palette = "Teal"
         self.theme_cls.primary_hue = "500"
+
+        menu_items = [
+            {
+                "text": f"Dark/Light theme",
+                "leading_icon": "theme-light-dark",
+                "height": dp(50),
+                "on_release": lambda x=f"Dark/Light theme": self.dark_light(),
+            },
+            {
+                "text": f"About",
+                "leading_icon": "charity",
+                "height": dp(50),
+                "on_release": lambda x=f"About": self.about_n_charity(),
+            },
+            {
+                "text": f"Exit",
+                "leading_icon": "logout",
+                "height": dp(50),
+                "on_release": lambda x=f"Quit": exit(),
+            }
+        ]
+        self.menu = MDDropdownMenu(
+            items=menu_items,
+            width_mult=4,
+        )
         return Container()
+
+    def callback(self, button):
+        self.menu.caller = button
+        self.menu.open()
 
     def dark_light(self):
         if self.theme_cls.theme_style == 'Light':
