@@ -17,12 +17,11 @@ The application was assembled into .aab format using:
 
 In the latest version of the application, the current exchange rates are collected using multithreading, which significantly speeds up the processes.
 
-<div style="align-items: center;">
-<img align="left" src="https://user-images.githubusercontent.com/101117780/227805241-df2a8532-3a4c-4307-884a-e5be6175601d.png" width="20%">
-<img align="left" src="https://user-images.githubusercontent.com/101117780/227805235-39a11b0c-53d9-47a5-a221-5d4dedcc54a0.png" width="20%">
-<img align="left" src="https://user-images.githubusercontent.com/101117780/227805229-eda03148-0ee5-426b-b1e7-2b8cb32f6d1e.png" width="20%">
+<div>
+<img align="center" float="right" src="https://user-images.githubusercontent.com/101117780/227805241-df2a8532-3a4c-4307-884a-e5be6175601d.png" width="25%">
+<img align="center" src="https://user-images.githubusercontent.com/101117780/227805235-39a11b0c-53d9-47a5-a221-5d4dedcc54a0.png" width="25%">
+<img align="center" src="https://user-images.githubusercontent.com/101117780/227805229-eda03148-0ee5-426b-b1e7-2b8cb32f6d1e.png" width="25%">
 </div>
-
 
 ## Links
 https://play.google.com/store/apps/details?id=buko.kate.yourconverter
