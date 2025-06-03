@@ -11,6 +11,8 @@ from kivymd.uix.dialog import MDDialog
 from kivy.metrics import dp
 from kivymd.uix.menu import MDDropdownMenu
 
+import re
+
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 
 
@@ -27,7 +29,7 @@ def gatherData(i):
 def no_internet():
     Htext = MDDialog(
         title="No internet",
-        text="Please, check your Internet connection. The application will be closed.",
+        text="Please, check your internet connection. The application will be closed.",
         buttons=[
             MDFlatButton(
                 text="Exit",
@@ -38,44 +40,47 @@ def no_internet():
 
 
 class Container(BoxLayout):
+
+    currency_validator = {'pln': 0, 'byn': 0, 'uah': 0, 'usd': 0, 'eur': 0, 'cad': 0}
+
     pool = ThreadPoolExecutor()
 
-    pln = pool.submit(gatherData, 'pln')
-    byn = pool.submit(gatherData, 'byn')
-    uah = pool.submit(gatherData, 'uah')
-    usd = pool.submit(gatherData, 'usd')
-    eur = pool.submit(gatherData, 'eur')
-    cad = pool.submit(gatherData, 'cad')
+    futures = {}
+    for code in currency_validator.keys():
+        futures[code] = pool.submit(gatherData, code)
 
-    pln_task = pln.result()
-    byn_task = byn.result()
-    uah_task = uah.result()
-    usd_task = usd.result()
-    eur_task = eur.result()
-    cad_task = cad.result()
-
-    currency_validator = {'pln': 0.00, 'byn': 0.00, 'uah': 0.00, 'usd': 0.00, 'eur': 0.00, 'cad': 0.00}
 
     def calculate(self, text, hint_text):
-        input_list = {self.pln: 'Pln', self.byn: 'Byn', self.uah: 'Uah', self.usd: 'Usd', self.eur: 'Eur',
-                      self.cad: 'Cad'}
+        input_list = {self.pln: 'Pln', self.byn: 'Byn', self.uah: 'Uah', self.usd: 'Usd', self.eur: 'Eur', self.cad: 'Cad'}
+
         for i in input_list:
-            if hint_text == input_list[i] and i.focus and i.text != '' \
-                    and float(i.text) != Container.currency_validator[input_list[i].lower()]:
-                return self.get_values(text, i)
-            elif hint_text == input_list[i] and i.focus and i.text == '':
-                for j in input_list.keys():
-                    j.text = ''
+            if hint_text == input_list[i] and i.focus and i.text != '':
+                text = re.sub(r'[^0-9.,]', '', text).replace(',', '.')
+                if text.count('.') > 1:
+                    first_dot = text.find('.')
+                    text = text.replace('.','')
+                    text = text[:first_dot]+'.'+text[first_dot:]
+                if re.fullmatch(r'\d+(\.\d{0,3})?', text) or re.fullmatch(r'\d+\.', text):
+                    return self.get_values(text, i)
+                else:
+                    for j in input_list.keys():
+                        j.text = ''
+
 
     def get_values(self, text, start_currency):
         try:
+            results = {}
+            for code, future in Container.futures.items():
+                results[f'{code}_task'] = future.result()
+
             calculated_data = {
-                self.pln: Container.pln_task, self.byn: Container.byn_task, self.uah: Container.uah_task,
-                self.usd: Container.usd_task, self.eur: Container.eur_task, self.cad: Container.cad_task
+                self.pln: results['pln_task'], self.byn: results['byn_task'], self.uah: results['uah_task'],
+                self.usd: results['usd_task'], self.eur: results['eur_task'], self.cad: results['cad_task']
             }
+
             for cur in Container.currency_validator.keys():
                 Container.currency_validator[cur.lower()] = \
-                    round((float(text) * calculated_data[start_currency][cur.upper()]), 2)
+                    round((float(text) * calculated_data[start_currency][cur.upper()]), 3)
 
             self.pln.text = str(Container.currency_validator['pln'])
             self.byn.text = str(Container.currency_validator['byn'])
@@ -121,22 +126,26 @@ class CalcApp(MDApp):
         )
         return Container()
 
+
     def callback(self, button):
         self.menu.caller = button
         self.menu.open()
 
+
     def dark_light(self):
         if self.theme_cls.theme_style == 'Light':
-            self.theme_cls.theme_style = 'Dark'
             self.theme_cls.primary_palette = "BlueGray"
+            self.theme_cls.theme_style = 'Dark'
             self.theme_cls.primary_hue = "600"
         else:
+            self.theme_cls.primary_palette = "Teal"
             self.theme_cls.theme_style = 'Light'
             self.theme_cls.primary_hue = "500"
-            self.theme_cls.primary_palette = "Teal"
+
 
     def clear_content(self, pln, byn, uah, usd, eur, cad):
         pln.text = byn.text = uah.text = usd.text = eur.text = cad.text = ''
+
 
     def about_n_charity(self):
         if not self.dialog:
@@ -150,14 +159,15 @@ class CalcApp(MDApp):
                      "\n\nThanks for choosing \"YourConverter\"!",
                 buttons=[
                     MDFlatButton(
-                        text="Later",
+                        text="close",
                         theme_text_color="Custom",
                         text_color=self.theme_cls.primary_color,
-                        on_release=lambda _: self.dialog.dismiss()
+                        on_press=lambda _: self.dialog.dismiss()
                     ),
                 ],
             )
         self.dialog.open()
+
 
 if __name__ == "__main__":
     CalcApp().run()

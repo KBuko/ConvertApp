@@ -7,6 +7,7 @@
     input_filter: 'float'
     mode: "fill"
 
+
 <Container>:
     orientation: 'vertical'
 
@@ -23,13 +24,12 @@
             [["menu", lambda x: app.callback(x)]]
         right_action_items:
             [
-            ["delete-outline", lambda x: app.clear_content(pln, byn, usd, uah, eur, cad), "clear fields"]
+            ["delete-outline", lambda x: app.clear_content(pln, byn, usd, uah, eur, cad), "clear fields"],
             ]
 
     BoxLayout:
         orientation: 'vertical'
         padding: ['35dp', '25dp', '47dp', '30dp']
-
 
         BoxLayout:
             orientation: 'vertical'
@@ -38,7 +38,6 @@
 
             GridLayout:
                 cols: 2
-
 
                 MDIconButton:
                     icon: 'images/pln.png'
@@ -54,7 +53,6 @@
             GridLayout:
                 cols: 2
 
-
                 MDIconButton:
                     icon: 'images/byn.png'
                     icon_size: "30sp"
@@ -65,9 +63,9 @@
                     hint_text: 'Byn'
                     on_text: root.calculate(self.text, self.hint_text)
 
+
             GridLayout:
                 cols: 2
-
 
                 MDIconButton:
                     icon: 'images/uah.png'
@@ -79,9 +77,9 @@
                     hint_text: 'Uah'
                     on_text: root.calculate(self.text, self.hint_text)
 
+
             GridLayout:
                 cols: 2
-
 
                 MDIconButton:
                     icon: 'images/usd.png'
