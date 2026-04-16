@@ -29,7 +29,7 @@ def gatherData(i):
 def no_internet():
     Htext = MDDialog(
         title="No internet",
-        text="Please, check your internet connection. The application will be closed.",
+        text="Please, check your internet connection. The app will be closed.",
         buttons=[
             MDFlatButton(
                 text="Exit",
@@ -41,7 +41,7 @@ def no_internet():
 
 class Container(BoxLayout):
 
-    currency_validator = {'pln': 0, 'byn': 0, 'uah': 0, 'usd': 0, 'eur': 0, 'cad': 0}
+    currency_validator = {'pln': 0, 'byn': 0, 'uah': 0, 'usd': 0, 'eur': 0, 'gbp': 0, 'cad': 0}
 
     pool = ThreadPoolExecutor()
 
@@ -51,7 +51,7 @@ class Container(BoxLayout):
 
 
     def calculate(self, text, hint_text):
-        input_list = {self.pln: 'Pln', self.byn: 'Byn', self.uah: 'Uah', self.usd: 'Usd', self.eur: 'Eur', self.cad: 'Cad'}
+        input_list = {self.pln: 'Pln', self.byn: 'Byn', self.uah: 'Uah', self.usd: 'Usd', self.eur: 'Eur', self.gbp: 'Gbp', self.cad: 'Cad'}
 
         for i in input_list:
             if hint_text == input_list[i] and i.focus and i.text != '':
@@ -75,7 +75,8 @@ class Container(BoxLayout):
 
             calculated_data = {
                 self.pln: results['pln_task'], self.byn: results['byn_task'], self.uah: results['uah_task'],
-                self.usd: results['usd_task'], self.eur: results['eur_task'], self.cad: results['cad_task']
+                self.usd: results['usd_task'], self.eur: results['eur_task'], self.cad: results['cad_task'],
+                self.gbp: results['gbp_task'],
             }
 
             for cur in Container.currency_validator.keys():
@@ -87,6 +88,7 @@ class Container(BoxLayout):
             self.usd.text = str(Container.currency_validator['usd'])
             self.uah.text = str(Container.currency_validator['uah'])
             self.eur.text = str(Container.currency_validator['eur'])
+            self.gbp.text = str(Container.currency_validator['gbp'])
             self.cad.text = str(Container.currency_validator['cad'])
         except:
             no_internet()
@@ -143,8 +145,8 @@ class CalcApp(MDApp):
             self.theme_cls.primary_hue = "500"
 
 
-    def clear_content(self, pln, byn, uah, usd, eur, cad):
-        pln.text = byn.text = uah.text = usd.text = eur.text = cad.text = ''
+    def clear_content(self, pln, byn, uah, usd, eur, gbp, cad):
+        pln.text = byn.text = uah.text = usd.text = eur.text = gbp.text = cad.text = ''
 
 
     def about_n_charity(self):
@@ -156,10 +158,16 @@ class CalcApp(MDApp):
                      "conversion of major currencies (in my opinion) within the current " \
                      "situation in the world. The application will be developed and " \
                      "supplemented with new features." \
+                    # "\n\nYou can support the project: just click on the \"See ads\" button." \
                      "\n\nThanks for choosing \"YourConverter\"!",
                 buttons=[
+                    # MDRaisedButton(
+                    #    text="See ads",
+                    #    theme_text_color="Custom",
+                    #    on_release=lambda a: self.ads.show_rewarded_ad()
+                    # ),
                     MDFlatButton(
-                        text="close",
+                        text="close it",
                         theme_text_color="Custom",
                         text_color=self.theme_cls.primary_color,
                         on_press=lambda _: self.dialog.dismiss()
