@@ -1,7 +1,7 @@
 # YourConverter
 <img align="right" src="https://user-images.githubusercontent.com/101117780/227804286-b03196bc-b7aa-433d-8a41-f48cadb7955b.png" width="20%">
 <b>YourConverter</b> is a mobile application for android developed in python.
-The application is a converter for six currencies. The currency converter converts a number relative to the currency in which the user has added new data.
+The application is a converter for seven currencies. The currency converter calculates the number in the currency in which the user entered the new data.
 
 
 ## Project Objective
@@ -12,8 +12,8 @@ Drawing the graphical component of the application:
 - KivyMD (v1.2.0)
 
 The application was assembled into .aab format using:
-- Bulldozer (v1.5.0)
-- Ubuntu (v22.04.1)
+- Buildozer (v1.5.1)
+- Ubuntu (v22.04.5)
 
 In the latest version of the application, the current exchange rates are collected using multithreading, which significantly speeds up the processes.
 
